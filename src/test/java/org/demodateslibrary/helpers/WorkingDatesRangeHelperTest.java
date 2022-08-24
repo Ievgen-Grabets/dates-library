@@ -11,7 +11,7 @@ import java.util.Set;
 import org.demodateslibrary.exception.WrongDatesRange;
 import org.junit.Test;
 
-public class WrongDatesRangeTest {
+public class WorkingDatesRangeHelperTest {
 
     /**
      * Final test from description
@@ -25,9 +25,10 @@ public class WrongDatesRangeTest {
         LocalDate holiday2 = LocalDate.parse("July 2, 2022", formatter);
         LocalDate weekend1 = LocalDate.parse("July 3, 2022", formatter);
 
-        WorkingDatesHelper workingDatesHelper = new WorkingDatesHelper(
+        var workingDatesHelper = new WorkingDatesHelperTypeInsensitiveImpl(
                 Set.of(holiday1, holiday2),
-                Set.of(weekend1));
+                Set.of(weekend1),
+                Collections.emptySet());
 
         assertEquals("By example we should have 5 days",
                      5,
@@ -38,34 +39,47 @@ public class WrongDatesRangeTest {
 
     @Test(expected = WrongDatesRange.class)
     public void passingFromAsNullValue() throws WrongDatesRange {
-        WorkingDatesHelper workingDatesHelper = new WorkingDatesHelper(Collections.emptySet(), Collections.emptySet());
+        var workingDatesHelper = new WorkingDatesHelperTypeInsensitiveImpl(
+                        Collections.emptySet(),
+                        Collections.emptySet(),
+                        Collections.emptySet());
         workingDatesHelper.workDaysBetween(null, LocalDate.now());
     }
 
     @Test(expected = WrongDatesRange.class)
     public void passingTillAsNullValue() throws WrongDatesRange {
-        WorkingDatesHelper workingDatesHelper = new WorkingDatesHelper(Collections.emptySet(), Collections.emptySet());
+        var workingDatesHelper = new WorkingDatesHelperTypeInsensitiveImpl(
+                        Collections.emptySet(),
+                        Collections.emptySet(),
+                        Collections.emptySet());
         workingDatesHelper.workDaysBetween(LocalDate.now(), null);
     }
 
     @Test(expected = WrongDatesRange.class)
     public void passingFromBAfterTill() throws WrongDatesRange {
-        WorkingDatesHelper workingDatesHelper = new WorkingDatesHelper(Collections.emptySet(), Collections.emptySet());
+        var workingDatesHelper = new WorkingDatesHelperTypeInsensitiveImpl(
+                        Collections.emptySet(),
+                        Collections.emptySet(),
+                        Collections.emptySet());
         workingDatesHelper.workDaysBetween(LocalDate.now().plusDays(2), LocalDate.now());
     }
 
     @Test
     public void oneDayAndOneHoliday() throws WrongDatesRange {
-        WorkingDatesHelper workingDatesHelper = new WorkingDatesHelper(Set.of(LocalDate.now()), Collections.emptySet());
+        var workingDatesHelper = new WorkingDatesHelperTypeInsensitiveImpl(
+                        Set.of(LocalDate.now()),
+                        Collections.emptySet(),
+                        Collections.emptySet());
         assertEquals("This day is holiday",
                      0, workingDatesHelper.workDaysBetween(LocalDate.now(), LocalDate.now()));
     }
 
     @Test
     public void tenDaysAndOneHolidayAndTwoDaysAsWeekend() throws WrongDatesRange {
-        WorkingDatesHelper workingDatesHelper = new WorkingDatesHelper(
+        var workingDatesHelper = new WorkingDatesHelperTypeInsensitiveImpl(
                 Set.of(LocalDate.now().plusDays(1)),
-                Set.of(LocalDate.now().plusDays(5), LocalDate.now().plusDays(6)));
+                Set.of(LocalDate.now().plusDays(5), LocalDate.now().plusDays(6)),
+                Collections.emptySet());
 
         assertEquals("This day is holiday",
                      7, workingDatesHelper.workDaysBetween(
@@ -75,9 +89,10 @@ public class WrongDatesRangeTest {
 
     @Test
     public void tenDaysAndOneHolidayAndTwoDaysAsWeekendNotInRange() throws WrongDatesRange {
-        WorkingDatesHelper workingDatesHelper = new WorkingDatesHelper(
+        var workingDatesHelper = new WorkingDatesHelperTypeInsensitiveImpl(
                 Set.of(LocalDate.now().plusDays(12)),
-                Set.of(LocalDate.now().plusDays(15), LocalDate.now().plusDays(16)));
+                Set.of(LocalDate.now().plusDays(15), LocalDate.now().plusDays(16)),
+                Collections.emptySet());
 
         assertEquals("This day is holiday",
                      10, workingDatesHelper.workDaysBetween(
